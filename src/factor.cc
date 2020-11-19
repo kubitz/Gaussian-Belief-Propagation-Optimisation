@@ -1,11 +1,11 @@
 #include <factor.h>
 #include <variable.h>
 
-Factor::Factor(const std::string &id) : id_(id) {}
+Factor::Factor(const std::pair<int,int>& id) : id_(id) {}
 
-const std::string& Factor::id() const { return id_; }
+const std::pair<int,int>& Factor::id() const { return id_; }
 
-void Factor::add_message(const std::string &from, const Gaussian &message) { inbox_[from] = message; }
+void Factor::add_message(const int& from, const Gaussian &message) { inbox_[from] = message; }
 
 void Factor::add_neighbor(Variable *v) {
     neighbors_.push_back(v);

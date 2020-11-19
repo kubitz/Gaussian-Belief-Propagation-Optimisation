@@ -43,7 +43,7 @@ int main (int argc, char **argv) {
     // Set all variable's initial estimate to (0, 0)
     // Anchor the nodes to the origin by applying strong prior to the first variable.
     for (size_t i = 0; i < poses.size(); ++i) {
-        auto v = G.add_variable("v" + std::to_string(i));
+        auto v = G.add_variable(i);
         v->set_prior(i == 0 ? strong_prior : weak_prior);
     }
 
@@ -62,10 +62,10 @@ int main (int argc, char **argv) {
         double x2 = poses[k].first;
         double y2 = poses[k].second;
 
-        Factor *f1 = G.add_factor("f" + std::to_string(i) + "-" + std::to_string(j));
+        Factor *f1 = G.add_factor({i, j});
         f1->set_measurement(utils::make_measurement(x1 - x0, y1 - y0, 0.1, 0.1));
         G.connect(f1, {i, j});
-        Factor *f2 = G.add_factor("f" + std::to_string(i) + "-" + std::to_string(k));
+        Factor *f2 = G.add_factor({i, k});
         f2->set_measurement(utils::make_measurement(x2 - x0, y2 - y0, 0.1, 0.1));
         G.connect(f2, {i, k});
     }
