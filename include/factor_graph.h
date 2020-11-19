@@ -10,11 +10,11 @@ private:
 public:
 
     FactorGraph() {}
-    Variable *add_variable(const std::string &variable_id) {
+    Variable *add_variable(const int &variable_id) {
         variables_.emplace_back(std::unique_ptr<Variable>(new Variable(variable_id)));
         return variables_.back().get();
     }
-    Factor *add_factor(const std::string &factor_id) {
+    Factor *add_factor(const std::pair<int,int> &factor_id) {
         factors_.emplace_back(std::unique_ptr<Factor>(new Factor(factor_id)));
         return factors_.back().get();
     }
