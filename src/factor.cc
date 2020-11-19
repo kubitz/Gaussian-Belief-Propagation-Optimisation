@@ -3,7 +3,7 @@
 
 Factor::Factor(const std::string &id) : id_(id) {}
 
-const std::string Factor::id() const { return id_; }
+const std::string& Factor::id() const { return id_; }
 
 void Factor::add_message(const std::string &from, const Gaussian &message) { inbox_[from] = message; }
 

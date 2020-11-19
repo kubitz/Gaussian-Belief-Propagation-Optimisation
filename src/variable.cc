@@ -14,9 +14,11 @@ void Variable::update_belief() {
     Eigen::VectorXd eta = prior_.eta();
     Eigen::MatrixXd lam = prior_.lam();
     for (Factor *f : neighbors_) {
-        if (inbox_.count(f->id())) {
-            eta += inbox_[f->id()].eta();
-            lam += inbox_[f->id()].lam();
+        const std::string& id = f->id();
+        if (inbox_.count(id)) {
+            const Gaussian& g = inbox_[id];
+            eta += g.eta();
+            lam += g.lam();
         }
     }
     belief_ = Gaussian(eta, lam);
@@ -25,9 +27,11 @@ void Variable::update_belief() {
 void Variable::send_messages() {
     for (Factor *f : neighbors_) {
         Gaussian msg = belief_;
-        if (inbox_.count(f->id())) {
-            msg.eta() -= inbox_[f->id()].eta();
-            msg.lam() -= inbox_[f->id()].lam();
+        const std::string& id = f->id();
+        if (inbox_.count(id)) {
+            const Gaussian& g = inbox_[id];
+            msg.eta() -= g.eta();
+            msg.lam() -= g.lam();
         }
         f->add_message(id_, msg);
     }

@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include <gaussian.h>
 class Factor;
 
@@ -8,7 +8,7 @@ private:
     std::string id_;
     Gaussian prior_;
     Gaussian belief_;
-    std::unordered_map<std::string, Gaussian> inbox_;
+    std::map<std::string, Gaussian> inbox_;
     std::vector<Factor *> neighbors_;
 
 public:
