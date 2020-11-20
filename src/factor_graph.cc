@@ -25,14 +25,10 @@ public:
     void iteration() {
         for (auto &variable : variables_) {
             variable->update_belief();
-        }
-        for (auto &factor: factors_) {
-            factor->update_factor();
-        }
-        for (auto &variable : variables_) {
             variable->send_messages();
         }
         for (auto &factor: factors_) {
+            factor->update_factor();
             factor->send_messages();
         }
     }
