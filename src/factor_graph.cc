@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include <vector>
 #include <memory>
 #include <factor.h>
@@ -32,5 +32,4 @@ public:
             factor->send_messages();
         }
     }
-}
-};
+};*/
