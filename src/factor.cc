@@ -18,11 +18,7 @@ void Factor::set_measurement(const Gaussian &measurement) {
 }
 
 void Factor::update_state() {
-    std::vector<Eigen::VectorXd> state;
-    for (Variable *neighbor : neighbors_) {
-        state.push_back(neighbor->belief().mu());
-    }
-    state_ = state;
+    state_ = {neighbors_[0]->belief().mu(), neighbors_[1]->belief().mu()};
 }
 
 void Factor::update_factor() {
