@@ -35,8 +35,7 @@ int count = 0;
 void Factor::send_messages() {
     Eigen::VectorXd eta_all = factor_.eta();
     Eigen::MatrixXd lam_all = factor_.lam();
-    // count += 1;
-    // my attempt ---------------------------------------------------------------------------
+
     Eigen::VectorXd eta_all_copy = factor_.eta();
     Eigen::MatrixXd lam_all_copy = factor_.lam();
 

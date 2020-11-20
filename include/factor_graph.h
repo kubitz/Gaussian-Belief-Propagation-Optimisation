@@ -35,10 +35,7 @@ public:
      #pragma omp parallel for
         for (auto &factor: factors_) {
             factor->update_factor();
-        #pragma omp critical
-        {  
             factor->send_messages();
-        }        
         }
         //for (auto &variable : variables_) {
         //}
