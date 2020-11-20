@@ -26,6 +26,8 @@ public:
     const Eigen::MatrixXd &lam() const { return lam_; }
     Eigen::VectorXd &eta() { return eta_; }
     Eigen::MatrixXd &lam() { return lam_; }
+    void setEta(const Eigen::VectorXd & eta) {eta_ = eta;}
+    void setLam(const Eigen::MatrixXd & lam) {lam_ = lam;}
 
     /* Helpers to convert between canonical form and standard form */
     Eigen::VectorXd mu() const { return lam_.inverse() * eta_; }

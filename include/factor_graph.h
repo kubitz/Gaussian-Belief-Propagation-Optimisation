@@ -24,21 +24,29 @@ public:
         }
     }
     void iteration() {
+    #pragma omp parallel for
         for (auto &variable : variables_) {
             variable->update_belief();
-        }
-        for (auto &factor: factors_) {
-            factor->update_factor();
-        }
-        for (auto &variable : variables_) {
+        #pragma omp critical
+        {  
             variable->send_messages();
         }
-        for (auto &factor: factors_) {
-            factor->send_messages();
         }
+     #pragma omp parallel for
+        for (auto &factor: factors_) {
+            factor->update_factor();
+        #pragma omp critical
+        {  
+            factor->send_messages();
+        }        }
+        //for (auto &variable : variables_) {
+        //}
+        //for (auto &factor: factors_) {
+        //}
     }
     double ARE() const {
         double residual_error = 0.f;
+    #pragma omp parallel for reduction(+:residual_error)
         for (auto &factor: factors_) {
             residual_error += factor->residual();
         }
