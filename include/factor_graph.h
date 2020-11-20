@@ -24,10 +24,12 @@ public:
         }
     }
     void iteration() {
+    #pragma omp parallel for
         for (auto &variable : variables_) {
             variable->update_belief();
             variable->send_messages();
         }
+    #pragma omp parallel for
         for (auto &factor: factors_) {
             factor->update_factor();
             factor->send_messages();
