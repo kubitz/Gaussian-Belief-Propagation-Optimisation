@@ -38,7 +38,8 @@ public:
         #pragma omp critical
         {  
             factor->send_messages();
-        }        }
+        }        
+        }
         //for (auto &variable : variables_) {
         //}
         //for (auto &factor: factors_) {
