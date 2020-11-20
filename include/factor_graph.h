@@ -39,6 +39,7 @@ public:
     }
     double ARE() const {
         double residual_error = 0.f;
+    #pragma omp parallel for reduction(+:residual_error)
         for (auto &factor: factors_) {
             residual_error += factor->residual();
         }
