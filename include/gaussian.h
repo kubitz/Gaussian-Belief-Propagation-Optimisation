@@ -37,20 +37,42 @@ public:
     Gaussian marginalize(uint32_t i, uint32_t j) const {
         uint32_t k = eta_.size();
         /* Indices excluding [i, j] */
-        std::vector<int> N;
-        for (int n = 0; n < k; ++n) { if (n < i || n > j) { N.push_back(n); } }
-        Eigen::VectorXd eta_a = eta_(Eigen::seq(i, j));
-        Eigen::VectorXd eta_b = eta_(N);
+        // std::vector<int> N;
+        // for (int n = 0; n < k; ++n) { if (n < i || n > j) { N.push_back(n); } }
 
-        Eigen::MatrixXd lam_aa = lam_(Eigen::seq(i, j), Eigen::seq(i, j));
-        Eigen::MatrixXd lam_ab = lam_(Eigen::seq(i, j), N);
-        Eigen::MatrixXd lam_ba = lam_(N, Eigen::seq(i, j));
-        Eigen::MatrixXd lam_bb = lam_(N, N);
+        Eigen::VectorXd eta_a;
+        Eigen::VectorXd eta_b;
+
+        Eigen::MatrixXd lam_aa;
+        Eigen::MatrixXd lam_ab;
+        Eigen::MatrixXd lam_ba;
+        Eigen::MatrixXd lam_bb;
+        
+        if (i == 0) {
+            eta_a = eta_(Eigen::seq(0, 1));
+            eta_b = eta_(Eigen::seq(2, 3));
+
+            lam_aa = lam_(Eigen::seq(0, 1), Eigen::seq(0, 1));
+            lam_ab = lam_(Eigen::seq(0, 1), Eigen::seq(2, 3));
+            lam_ba = lam_(Eigen::seq(2, 3), Eigen::seq(0, 1));
+            lam_bb = lam_(Eigen::seq(2, 3), Eigen::seq(2, 3));
+        }
+
+        if (i == 2) {
+            eta_a = eta_(Eigen::seq(2, 3));
+            eta_b = eta_(Eigen::seq(0, 1));
+
+            lam_aa = lam_(Eigen::seq(2, 3), Eigen::seq(2, 3));
+            lam_ab = lam_(Eigen::seq(2, 3), Eigen::seq(0, 1));
+            lam_ba = lam_(Eigen::seq(0, 1), Eigen::seq(2, 3));
+            lam_bb = lam_(Eigen::seq(0, 1), Eigen::seq(0, 1));
+        }
 
         Eigen::MatrixXd lam_bb_inv = lam_bb.inverse();
 
         Eigen::VectorXd eta = eta_a - lam_ab * lam_bb_inv * eta_b;
         Eigen::MatrixXd lam = lam_aa - lam_ab * lam_bb_inv * lam_ba;
+
         return Gaussian(eta, lam);
     }
 };
