@@ -18,11 +18,7 @@ void Factor::set_measurement(const Gaussian &measurement) {
 }
 
 void Factor::update_state() {
-    std::vector<Eigen::VectorXd> state;
-    for (Variable *neighbor : neighbors_) {
-        state.push_back(neighbor->belief().mu());
-    }
-    state_ = state;
+    state_ = {neighbors_[0]->belief().mu(), neighbors_[1]->belief().mu()};
 }
 
 void Factor::update_factor() {
@@ -30,7 +26,7 @@ void Factor::update_factor() {
     Eigen::MatrixXd J = jacobian(state_);
     Eigen::VectorXd h = predict_measurement(state_);
     Eigen::VectorXd x0 = flatten(state_);
-    Eigen::VectorXd eta = J.transpose() * measurement_.lam() * (J * x0 + measurement_.mu() - h);
+    Eigen::VectorXd eta = J.transpose() * ( measurement_.lam() * (J * x0 - h) +   measurement_.eta() );
     Eigen::MatrixXd lam = J.transpose() * measurement_.lam() * J;
     factor_ = Gaussian(eta, lam);
 }
@@ -42,14 +38,14 @@ void Factor::send_messages() {
     Eigen::VectorXd eta_all_copy = factor_.eta();
     Eigen::MatrixXd lam_all_copy = factor_.lam();
 
-    Gaussian msg = inbox_[neighbors_[0]->id()];
+    const Gaussian& msg = inbox_[neighbors_[0]->id()];
 
     eta_all(Eigen::seq(0, 1)) += msg.eta();
     lam_all(Eigen::seq(0, 1), Eigen::seq(0, 1)) += msg.lam();
 
     neighbors_[1]->add_message(id_, Gaussian(eta_all, lam_all).marginalize(2, 3));
     
-    Gaussian msg2 = inbox_[neighbors_[1]->id()];
+    const Gaussian& msg2 = inbox_[neighbors_[1]->id()];
 
     eta_all_copy(Eigen::seq(2, 3)) += msg2.eta();
     lam_all_copy(Eigen::seq(2, 3), Eigen::seq(2, 3)) += msg2.lam();
