@@ -1,6 +1,7 @@
 #include <variable.h>
 #include <factor.h>
 #include <utility> 
+#include <iostream>
 
 Variable::Variable(const int& id) : id_(id) {}
 
@@ -14,6 +15,7 @@ const Gaussian &Variable::belief() const { return belief_; }
 void Variable::update_belief() {
     Eigen::VectorXd eta = prior_.eta();
     Eigen::MatrixXd lam = prior_.lam();
+
     for (Factor *f : neighbors_) {
         const std::pair<int,int>& id = f->id();
         if (inbox_.count(id)) {

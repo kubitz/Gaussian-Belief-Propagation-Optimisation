@@ -34,13 +34,11 @@ void Factor::update_factor() {
     Eigen::MatrixXd lam = J.transpose() * measurement_.lam() * J;
     factor_ = Gaussian(eta, lam);
 }
-int count = 0;
 
 void Factor::send_messages() {
     Eigen::VectorXd eta_all = factor_.eta();
     Eigen::MatrixXd lam_all = factor_.lam();
-    // count += 1;
-    // my attempt ---------------------------------------------------------------------------
+
     Eigen::VectorXd eta_all_copy = factor_.eta();
     Eigen::MatrixXd lam_all_copy = factor_.lam();
 
@@ -57,72 +55,6 @@ void Factor::send_messages() {
     lam_all_copy(Eigen::seq(2, 3), Eigen::seq(2, 3)) += msg2.lam();
 
     neighbors_[0]->add_message(id_, Gaussian(eta_all_copy, lam_all_copy).marginalize(0, 1));
-    // end attempt --------------------------------------------------------------------------
-
-    // second attempt -----------------------------------------------------------------------
-    // Eigen::VectorXd eta_all_copy = factor_.eta();
-    // Eigen::MatrixXd lam_all_copy = factor_.lam();
-    // int i = 0;
-
-    // for (int ind = 0; ind < neighbors_.size(); ++ind) {
-    //     Variable *v = neighbors_[ind];
-    //     Gaussian msg = inbox_[v->id()];
-    //     int j = i + msg.eta().size() - 1;
-
-    //     if (ind == 0) {
-    //         eta_all(Eigen::seq(i, j)) += msg.eta();
-    //         lam_all(Eigen::seq(i, j), Eigen::seq(i, j)) += msg.lam();
-    //     }
-        
-    //     if (ind == 1) {
-    //         eta_all_copy(Eigen::seq(i, j)) += msg.eta();
-    //         lam_all_copy(Eigen::seq(i, j), Eigen::seq(i, j)) += msg.lam();
-    //         neighbors_[ind]->add_message(id_, Gaussian(eta_all, lam_all).marginalize(i, j));
-    //         neighbors_[ind - 1]->add_message(id_, Gaussian(eta_all_copy, lam_all_copy).marginalize(i, j));
-    //     }
-    // }
-    // end attempt --------------------------------------------------------------------------
-    // std::cout << "SEND MESSAGES -------------------------------------------------------------" << count << std::endl;
-    // int i = 0;
-    // // std::cout << "How many neighbours?: " << neighbors_.size() << std::endl; 
-    // // std::cout << neighbors_.at(2) << std::endl;
-    // for (Variable *v : neighbors_) {
-    //     // std::cout << "START ----------------------------------" << std::endl;
-    //     Gaussian msg = inbox_[v->id()];
-    //     int j = i + msg.eta().size() - 1;
-    //     // std::cout << "i: " << i << ", j: " << j << std::endl;
-    //     // std::cout << "Eta.size(): " << msg.eta().size() << std::endl;
-    //     // if (once == false) {
-    //         // std::cout << "Eta before \n" << eta_all << std::endl;
-    //         // std::cout << "Lam before \n" << lam_all << std::endl;
-    //     // }
-    //     eta_all(Eigen::seq(i, j)) += msg.eta();
-    //     lam_all(Eigen::seq(i, j), Eigen::seq(i, j)) += msg.lam();
-    //     // if (once == false) {
-    //         // std::cout << "Eta adding this \n" << msg.eta() << std::endl;
-    //         // std::cout << "Eta after \n" << eta_all << std::endl;
-    //         // std::cout << "Lam adding this \n" << msg.lam() << std::endl;
-    //         // std::cout << "Lam after \n" << lam_all << std::endl;
-    //     // }
-    //     // once = true;
-    //     i = j + 1;
-    //     // std::cout << "END ------------------------------------" << std::endl;
-    // }
-    // i = 0;
-    // for (Variable *v : neighbors_) {
-    //     Gaussian msg = inbox_[v->id()];
-    //     int j = i + msg.eta().size() - 1;
-    //     Eigen::VectorXd eta = eta_all;
-    //     Eigen::MatrixXd lam = lam_all;
-    //     // std::cout << "Eta before \n" << eta << std::endl;
-    //     eta(Eigen::seq(i, j)) -= msg.eta();
-    //     // std::cout << "Eta after \n" << eta << std::endl;
-    //     lam(Eigen::seq(i, j), Eigen::seq(i, j)) -= msg.lam();
-    //     v->add_message(id_, Gaussian(eta, lam).marginalize(i, j));
-    //     i = j + 1;
-    // }
-
-    // std::cout << "Iteration done" << std::endl;
 }
 
 double Factor::residual() const {
