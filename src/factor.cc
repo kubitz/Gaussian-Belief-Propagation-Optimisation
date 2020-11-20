@@ -30,7 +30,7 @@ void Factor::update_factor() {
     Eigen::MatrixXd J = jacobian(state_);
     Eigen::VectorXd h = predict_measurement(state_);
     Eigen::VectorXd x0 = flatten(state_);
-    Eigen::VectorXd eta = J.transpose() * measurement_.lam() * (J * x0 + measurement_.mu() - h);
+    Eigen::VectorXd eta = J.transpose() * ( measurement_.lam() * (J * x0 - h) +   measurement_.eta() );
     Eigen::MatrixXd lam = J.transpose() * measurement_.lam() * J;
     factor_ = Gaussian(eta, lam);
 }
