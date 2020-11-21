@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include <gaussian.h>
 class Variable;
 
@@ -9,7 +9,7 @@ private:
     Gaussian factor_;
     Gaussian measurement_;
     std::vector<Eigen::VectorXd> state_;
-    std::unordered_map<std::string, Gaussian> inbox_;
+    std::map<std::string, Gaussian> inbox_;
     std::vector<Variable *> neighbors_;
     Eigen::VectorXd flatten(const std::vector<Eigen::VectorXd> &xs);
 
