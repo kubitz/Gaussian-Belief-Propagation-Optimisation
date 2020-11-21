@@ -2,14 +2,15 @@
 #include <variable.h>
 // #include <iostream>
 
-Factor::Factor(const std::pair<int,int>& id) : id_(id) {}
+Factor::Factor() {}
 
-const std::pair<int,int>& Factor::id() const { return id_; }
+//const std::pair<int,int>& Factor::id() const { return id_; }
 
-void Factor::add_message(const int& from, const Gaussian &message) { inbox_[from] = message; }
+void Factor::add_message( Variable* from, const Gaussian &message) { inbox_[from] = message; }
 
 void Factor::add_neighbor(Variable *v) {
     neighbors_.push_back(v);
+    inbox_[v]=Gaussian();
     v->add_neighbor(this);
 }
 
@@ -35,7 +36,7 @@ void Factor::send_messages() {
     Eigen::VectorXd eta_all = factor_.eta();
     Eigen::MatrixXd lam_all = factor_.lam();
 
-    const Gaussian& msg = inbox_[neighbors_[0]->id()];
+    const Gaussian& msg = inbox_[neighbors_[0]];
 
     eta_all(Eigen::seq(0, 1)) += msg.eta();
     lam_all(Eigen::seq(0, 1), Eigen::seq(0, 1)) += msg.lam();

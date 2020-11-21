@@ -36,8 +36,7 @@ public:
     /* Marginalization */
     Gaussian marginalize(uint32_t i, uint32_t j) const {
         Eigen::Vector2d eta;
-        Eigen::Matrix2d lam;
-        
+        Eigen::Matrix2d lam;        
         if (i == 0) {
             Eigen::Vector2d eta_a = eta_(Eigen::seq(0, 1));
             Eigen::Vector2d eta_b = eta_(Eigen::seq(2, 3));
