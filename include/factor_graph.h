@@ -43,18 +43,19 @@ public:
     #pragma omp parallel for
         for (auto &variable : variables_) {
             variable->update_belief();
-        #pragma omp critical
-        {  
+        //#pragma omp critical
+        //{  
             variable->send_messages();
-        }
+        //}
         }
      #pragma omp parallel for
         for (auto &factor: factors_) {
             factor->update_factor();
-        #pragma omp critical
-        {  
+        //#pragma omp critical
+        //{  
             factor->send_messages();
-        }        }
+        //}
+                }
         //for (auto &variable : variables_) {
         //}
         //for (auto &factor: factors_) {

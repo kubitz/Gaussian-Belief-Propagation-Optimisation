@@ -45,14 +45,18 @@ void Factor::send_messages() {
     eta_all(Eigen::seq(0, 1)) += msg.eta();
     lam_all(Eigen::seq(0, 1), Eigen::seq(0, 1)) += msg.lam();
 
-    neighbors_[1]->add_message(this, Gaussian(eta_all, lam_all).marginalize(2, 3));
-    
+    Gaussian newg = Gaussian(eta_all, lam_all).marginalize(2, 3)
+        //#pragma omp critical
+    neighbors_[1]->add_message(this, newg);
+ 
     const Gaussian& msg2 = inbox_[neighbors_[1]];
 
     eta_all_copy(Eigen::seq(2, 3)) += msg2.eta();
     lam_all_copy(Eigen::seq(2, 3), Eigen::seq(2, 3)) += msg2.lam();
 
-    neighbors_[0]->add_message(this, Gaussian(eta_all_copy, lam_all_copy).marginalize(0, 1));
+    newg = Gaussian(eta_all_copy, lam_all_copy).marginalize(0, 1)
+        //#pragma omp critical
+    neighbors_[0]->add_message(this, newg);
     // end attempt --------------------------------------------------------------------------
 
     // second attempt -----------------------------------------------------------------------

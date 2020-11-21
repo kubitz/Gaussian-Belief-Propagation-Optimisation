@@ -50,6 +50,7 @@ void Variable::send_messages() {
         const Gaussian& g = inbox_[f];
         msg.eta() -= g.eta();
         msg.lam() -= g.lam();
+        //#pragma omp critical
         f->add_message(this, msg);
     }
 }
