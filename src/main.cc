@@ -98,6 +98,6 @@ int main (int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    std::cout << N << " " << num_iterations << " " << std::setprecision(9) << diff.count() / num_iterations << " " << diff.count() << "\n";
+    std::cout << "num_nodes," << N << ", num_iter, " << num_iterations << ", precision," << std::setprecision(9) << diff.count() / num_iterations << ",exec_time," << diff.count() << "\n";
     return 0;
 }
