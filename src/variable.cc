@@ -6,7 +6,7 @@ Variable::Variable() {}
 
 //const int Variable::id() const { return id_; }
 
-void Variable::add_neighbor(Factor *f) { neighbors_.push_back(f); }
+void Variable::add_neighbor(Factor *f) { neighbors_.push_back(f); inbox_[f]=Gaussian(); }
 void Variable::set_prior(const Gaussian &prior) { prior_ = prior; }
 void Variable::add_message(Factor* from, const Gaussian &message) { inbox_[from] = message; }
 const Gaussian &Variable::belief() const { return belief_; }
