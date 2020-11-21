@@ -1,11 +1,9 @@
 #include <factor.h>
 #include <variable.h>
 
-Factor::Factor(const std::string &id) : id_(id) {}
+Factor::Factor() {}
 
-const std::string Factor::id() const { return id_; }
-
-void Factor::add_message(const std::string &from, const Gaussian &message) { inbox_[from] = message; }
+void Factor::add_message(Variable* from, const Gaussian &message) { inbox_[from] = message; }
 
 void Factor::add_neighbor(Variable *v) {
     neighbors_.push_back(v);
@@ -40,7 +38,7 @@ void Factor::send_messages() {
 
     int i = 0;
     for (Variable *v : neighbors_) {
-        Gaussian msg = inbox_[v->id()];
+        Gaussian msg = inbox_[v];
         int j = i + msg.eta().size() - 1;
         eta_all(Eigen::seq(i, j)) += msg.eta();
         lam_all(Eigen::seq(i, j), Eigen::seq(i, j)) += msg.lam();
@@ -48,13 +46,13 @@ void Factor::send_messages() {
     }
     i = 0;
     for (Variable *v : neighbors_) {
-        Gaussian msg = inbox_[v->id()];
+        Gaussian msg = inbox_[v];
         int j = i + msg.eta().size() - 1;
         Eigen::VectorXd eta = eta_all;
         Eigen::MatrixXd lam = lam_all;
         eta(Eigen::seq(i, j)) -= msg.eta();
         lam(Eigen::seq(i, j), Eigen::seq(i, j)) -= msg.lam();
-        v->add_message(id_, Gaussian(eta, lam).marginalize(i, j));
+        v->add_message(this, Gaussian(eta, lam).marginalize(i, j));
         i = j + 1;
     }
 }

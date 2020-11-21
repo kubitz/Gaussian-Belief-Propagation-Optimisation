@@ -10,12 +10,12 @@ private:
 public:
 
     FactorGraph() {}
-    Variable *add_variable(const std::string &variable_id) {
-        variables_.emplace_back(std::unique_ptr<Variable>(new Variable(variable_id)));
+    Variable *add_variable() {
+        variables_.emplace_back(std::unique_ptr<Variable>(new Variable()));
         return variables_.back().get();
     }
-    Factor *add_factor(const std::string &factor_id) {
-        factors_.emplace_back(std::unique_ptr<Factor>(new Factor(factor_id)));
+    Factor *add_factor() {
+        factors_.emplace_back(std::unique_ptr<Factor>(new Factor()));
         return factors_.back().get();
     }
     void connect(Factor *factor, std::initializer_list<size_t> variables) {
