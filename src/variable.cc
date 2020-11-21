@@ -1,6 +1,7 @@
 #include <variable.h>
 #include <factor.h>
 #include <utility> 
+#include <iostream>
 
 Variable::Variable() {}
 
@@ -32,9 +33,6 @@ void Variable::send_messages1() {
 void Variable::update_belief() {
     Eigen::VectorXd eta = prior_.eta();
     Eigen::MatrixXd lam = prior_.lam();
-    //if(id_==0){
-    //std::cout<<neighbors_.size()<<std::endl;
-    //}
     for (Factor *f : neighbors_) {
         const Gaussian& g = inbox_[f];
         eta += g.eta();
