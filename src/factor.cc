@@ -2,11 +2,11 @@
 #include <variable.h>
 // #include <iostream>
 
-Factor::Factor(const std::pair<int,int>& id) : id_(id) {}
+Factor::Factor() {}
 
-const std::pair<int,int>& Factor::id() const { return id_; }
+//const std::pair<int,int>& Factor::id() const { return id_; }
 
-void Factor::add_message(const int& from, const Gaussian &message) { inbox_[from] = message; }
+void Factor::add_message( Variable* from, const Gaussian &message) { inbox_[from] = message; }
 
 void Factor::add_neighbor(Variable *v) {
     neighbors_.push_back(v);
@@ -40,19 +40,19 @@ void Factor::send_messages() {
     Eigen::VectorXd eta_all_copy = factor_.eta();
     Eigen::MatrixXd lam_all_copy = factor_.lam();
 
-    const Gaussian& msg = inbox_[neighbors_[0]->id()];
+    const Gaussian& msg = inbox_[neighbors_[0]];
 
     eta_all(Eigen::seq(0, 1)) += msg.eta();
     lam_all(Eigen::seq(0, 1), Eigen::seq(0, 1)) += msg.lam();
 
-    neighbors_[1]->add_message(id_, Gaussian(eta_all, lam_all).marginalize(2, 3));
+    neighbors_[1]->add_message(this, Gaussian(eta_all, lam_all).marginalize(2, 3));
     
-    const Gaussian& msg2 = inbox_[neighbors_[1]->id()];
+    const Gaussian& msg2 = inbox_[neighbors_[1]];
 
     eta_all_copy(Eigen::seq(2, 3)) += msg2.eta();
     lam_all_copy(Eigen::seq(2, 3), Eigen::seq(2, 3)) += msg2.lam();
 
-    neighbors_[0]->add_message(id_, Gaussian(eta_all_copy, lam_all_copy).marginalize(0, 1));
+    neighbors_[0]->add_message(this, Gaussian(eta_all_copy, lam_all_copy).marginalize(0, 1));
     // end attempt --------------------------------------------------------------------------
 
     // second attempt -----------------------------------------------------------------------

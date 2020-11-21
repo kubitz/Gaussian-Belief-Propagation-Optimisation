@@ -34,7 +34,7 @@ public:
     Eigen::MatrixXd sig() const { return lam_.inverse(); }
 
     /* Marginalization */
-    Gaussian marginalize(uint32_t i, uint32_t j) const {
+    inline Gaussian marginalize(uint32_t i, uint32_t j) const {
         uint32_t k = eta_.size();
         /* Indices excluding [i, j] */
         std::vector<int> N;
