@@ -13,3 +13,5 @@ cd build
 ./GBP <N>
 ```
 Where N is the number of nodes in the graph
+
+The binary in the ./build folder was compiled using profile-guided optimization, please do not run make again!.
