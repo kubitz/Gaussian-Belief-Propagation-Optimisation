@@ -1,14 +1,16 @@
 #include <factor.h>
 #include <variable.h>
+// #include <iostream>
 
-Factor::Factor(const std::pair<int,int>& id) : id_(id) {}
+Factor::Factor() {}
 
-const std::pair<int,int>& Factor::id() const { return id_; }
+//const std::pair<int,int>& Factor::id() const { return id_; }
 
-void Factor::add_message(const int& from, const Gaussian &message) { inbox_[from] = message; }
+void Factor::add_message( Variable* from, const Gaussian &message) { inbox_[from] = message; }
 
 void Factor::add_neighbor(Variable *v) {
     neighbors_.push_back(v);
+    inbox_[v]=Gaussian();
     v->add_neighbor(this);
 }
 
@@ -17,11 +19,7 @@ void Factor::set_measurement(const Gaussian &measurement) {
 }
 
 void Factor::update_state() {
-    std::vector<Eigen::VectorXd> state;
-    for (Variable *neighbor : neighbors_) {
-        state.push_back(neighbor->belief().mu());
-    }
-    state_ = state;
+    state_ = {neighbors_[0]->belief().mu(), neighbors_[1]->belief().mu()};
 }
 
 void Factor::update_factor() {
@@ -29,7 +27,7 @@ void Factor::update_factor() {
     Eigen::MatrixXd J = jacobian(state_);
     Eigen::VectorXd h = predict_measurement(state_);
     Eigen::VectorXd x0 = flatten(state_);
-    Eigen::VectorXd eta = J.transpose() * measurement_.lam() * (J * x0 + measurement_.mu() - h);
+    Eigen::VectorXd eta = J.transpose() * ( measurement_.lam() * (J * x0 - h) +   measurement_.eta() );
     Eigen::MatrixXd lam = J.transpose() * measurement_.lam() * J;
     factor_ = Gaussian(eta, lam);
 }
@@ -38,25 +36,22 @@ void Factor::send_messages() {
     Eigen::VectorXd eta_all = factor_.eta();
     Eigen::MatrixXd lam_all = factor_.lam();
 
-    int i = 0;
-    for (Variable *v : neighbors_) {
-        Gaussian msg = inbox_[v->id()];
-        int j = i + msg.eta().size() - 1;
-        eta_all(Eigen::seq(i, j)) += msg.eta();
-        lam_all(Eigen::seq(i, j), Eigen::seq(i, j)) += msg.lam();
-        i = j + 1;
-    }
-    i = 0;
-    for (Variable *v : neighbors_) {
-        Gaussian msg = inbox_[v->id()];
-        int j = i + msg.eta().size() - 1;
-        Eigen::VectorXd eta = eta_all;
-        Eigen::MatrixXd lam = lam_all;
-        eta(Eigen::seq(i, j)) -= msg.eta();
-        lam(Eigen::seq(i, j), Eigen::seq(i, j)) -= msg.lam();
-        v->add_message(id_, Gaussian(eta, lam).marginalize(i, j));
-        i = j + 1;
-    }
+    const Gaussian& msg = inbox_[neighbors_[0]];
+
+    eta_all(Eigen::seq(0, 1)) += msg.eta();
+    lam_all(Eigen::seq(0, 1), Eigen::seq(0, 1)) += msg.lam();
+
+    neighbors_[1]->add_message(this, Gaussian(eta_all, lam_all).marginalize(2, 3));
+
+    eta_all(Eigen::seq(0, 1)) -= msg.eta();
+    lam_all(Eigen::seq(0, 1), Eigen::seq(0, 1)) -= msg.lam();
+    
+    const Gaussian& msg2 = inbox_[neighbors_[1]];
+
+    eta_all(Eigen::seq(2, 3)) += msg2.eta();
+    lam_all(Eigen::seq(2, 3), Eigen::seq(2, 3)) += msg2.lam();
+
+    neighbors_[0]->add_message(this, Gaussian(eta_all, lam_all).marginalize(0, 1));
 }
 
 double Factor::residual() const {

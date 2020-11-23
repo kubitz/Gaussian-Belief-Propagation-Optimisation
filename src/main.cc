@@ -73,9 +73,11 @@ int main (int argc, char **argv) {
 
     auto start = std::chrono::high_resolution_clock::now();
     int num_iterations = 0;
+    G.iteration1();
+    num_iterations++;
     for (; num_iterations < 1000; ++num_iterations) {
-        G.iteration();
         if (G.ARE() / N < 1e-7) { break; }
+        G.iteration();
     }
 
     auto end = std::chrono::high_resolution_clock::now();

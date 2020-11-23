@@ -11,11 +11,11 @@ public:
 
     FactorGraph() {}
     Variable *add_variable(const int &variable_id) {
-        variables_.emplace_back(std::unique_ptr<Variable>(new Variable(variable_id)));
+        variables_.emplace_back(std::unique_ptr<Variable>(new Variable()));
         return variables_.back().get();
     }
     Factor *add_factor(const std::pair<int,int> &factor_id) {
-        factors_.emplace_back(std::unique_ptr<Factor>(new Factor(factor_id)));
+        factors_.emplace_back(std::unique_ptr<Factor>(new Factor()));
         return factors_.back().get();
     }
     void connect(Factor *factor, std::initializer_list<size_t> variables) {
@@ -23,22 +23,49 @@ public:
             factor->add_neighbor(variables_[v].get());
         }
     }
-    void iteration() {
+
+    void iteration1() {
+        #pragma omp parallel for
         for (auto &variable : variables_) {
-            variable->update_belief();
+            variable->update_belief1();
+            variable->send_messages1();
         }
+        #pragma omp parallel for
         for (auto &factor: factors_) {
             factor->update_factor();
-        }
-        for (auto &variable : variables_) {
-            variable->send_messages();
-        }
-        for (auto &factor: factors_) {
             factor->send_messages();
         }
+        //for (auto &variable : variables_) {
+        //}
+        //for (auto &factor: factors_) {
+        //}
+    }
+
+    void iteration() {
+    #pragma omp parallel for
+        for (auto &variable : variables_) {
+            variable->update_belief();
+        //#pragma omp critical
+        //{  
+            variable->send_messages();
+        //}
+        }
+     #pragma omp parallel for
+        for (auto &factor: factors_) {
+            factor->update_factor();
+        //#pragma omp critical
+        //{  
+            factor->send_messages();
+        //}
+                }
+        //for (auto &variable : variables_) {
+        //}
+        //for (auto &factor: factors_) {
+        //}
     }
     double ARE() const {
         double residual_error = 0.f;
+    #pragma omp parallel for reduction(+:residual_error)
         for (auto &factor: factors_) {
             residual_error += factor->residual();
         }

@@ -1,0 +1,4 @@
+/homes/tkh2017/COMPARCH-CW/build/CMakeFiles/rebuild_cache.dir
+/homes/tkh2017/COMPARCH-CW/build/CMakeFiles/edit_cache.dir
+/homes/tkh2017/COMPARCH-CW/build/CMakeFiles/GBP.dir
+/homes/tkh2017/COMPARCH-CW/build/CMakeFiles/libGBP.dir

@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblibGBP.a  CMakeFiles/libGBP.dir/src/variable.cc.o CMakeFiles/libGBP.dir/src/factor.cc.o
+/usr/bin/ranlib liblibGBP.a

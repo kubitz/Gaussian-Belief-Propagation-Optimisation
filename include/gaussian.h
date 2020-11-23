@@ -26,6 +26,8 @@ public:
     const Eigen::MatrixXd &lam() const { return lam_; }
     Eigen::VectorXd &eta() { return eta_; }
     Eigen::MatrixXd &lam() { return lam_; }
+    void setEta(const Eigen::VectorXd & eta) {eta_ = eta;}
+    void setLam(const Eigen::MatrixXd & lam) {lam_ = lam;}
 
     /* Helpers to convert between canonical form and standard form */
     Eigen::VectorXd mu() const { return lam_.inverse() * eta_; }
@@ -33,22 +35,40 @@ public:
 
     /* Marginalization */
     Gaussian marginalize(uint32_t i, uint32_t j) const {
-        uint32_t k = eta_.size();
-        /* Indices excluding [i, j] */
-        std::vector<int> N;
-        for (int n = 0; n < k; ++n) { if (n < i || n > j) { N.push_back(n); } }
-        Eigen::VectorXd eta_a = eta_(Eigen::seq(i, j));
-        Eigen::VectorXd eta_b = eta_(N);
+        Eigen::Vector2d eta;
+        Eigen::Matrix2d lam;        
+        if (i == 0) {
+            Eigen::Vector2d eta_a = eta_(Eigen::seq(0, 1));
+            Eigen::Vector2d eta_b = eta_(Eigen::seq(2, 3));
 
-        Eigen::MatrixXd lam_aa = lam_(Eigen::seq(i, j), Eigen::seq(i, j));
-        Eigen::MatrixXd lam_ab = lam_(Eigen::seq(i, j), N);
-        Eigen::MatrixXd lam_ba = lam_(N, Eigen::seq(i, j));
-        Eigen::MatrixXd lam_bb = lam_(N, N);
+            Eigen::Matrix2d lam_bb = lam_(Eigen::seq(2, 3), Eigen::seq(2, 3));
+            Eigen::Matrix2d lam_ab = lam_(Eigen::seq(0, 1), Eigen::seq(2, 3));
+            Eigen::Matrix2d lam_bb_inv = lam_bb.inverse();
 
-        Eigen::MatrixXd lam_bb_inv = lam_bb.inverse();
+            eta = eta_a - lam_ab * lam_bb_inv * eta_b;
+            
+            Eigen::Matrix2d lam_ba = lam_(Eigen::seq(2, 3), Eigen::seq(0, 1));
+            Eigen::Matrix2d lam_aa = lam_(Eigen::seq(0, 1), Eigen::seq(0, 1));
 
-        Eigen::VectorXd eta = eta_a - lam_ab * lam_bb_inv * eta_b;
-        Eigen::MatrixXd lam = lam_aa - lam_ab * lam_bb_inv * lam_ba;
+            lam = lam_aa - lam_ab * lam_bb_inv * lam_ba;
+        }
+
+        if (i == 2) {
+            Eigen::Vector2d eta_a = eta_(Eigen::seq(2, 3));
+            Eigen::Vector2d eta_b = eta_(Eigen::seq(0, 1));
+
+            Eigen::Matrix2d lam_bb = lam_(Eigen::seq(0, 1), Eigen::seq(0, 1));
+            Eigen::Matrix2d lam_ab = lam_(Eigen::seq(2, 3), Eigen::seq(0, 1));
+            Eigen::Matrix2d lam_bb_inv = lam_bb.inverse();
+
+            eta = eta_a - lam_ab * lam_bb_inv * eta_b;
+            
+            Eigen::Matrix2d lam_ba = lam_(Eigen::seq(0, 1), Eigen::seq(2, 3));
+            Eigen::Matrix2d lam_aa = lam_(Eigen::seq(2, 3), Eigen::seq(2, 3));
+
+            lam = lam_aa - lam_ab * lam_bb_inv * lam_ba;
+        }
+
         return Gaussian(eta, lam);
     }
 };
